@@ -2,12 +2,13 @@ require "capybara"
 require "selenium-webdriver"
 require "webdrivers"
 
+require_relative "../nonexistant_guess_error"
+
 module Board
   class WordleUnlimited
     attr :session
 
     def initialize
-      @guesses = []
       @session = Capybara::Session.new(:selenium_chrome)
     end
 
@@ -19,11 +20,13 @@ module Board
       guess.chars.map(&:upcase).each { |letter| click(letter) }
       click("Enter")
 
-      answer_invalid? ? clear_answer! : @guesses << guess
+      if answer_invalid?
+        clear_answer!
+        raise NonexistantGuessError
+      end
     end
 
     def reset!
-      @guesses = []
       click("Enter")
     end
 

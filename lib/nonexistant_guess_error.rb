@@ -1,0 +1,1 @@
+NonexistantGuessError = Class.new(StandardError)

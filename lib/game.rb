@@ -1,9 +1,12 @@
 require "debug"
 
 require_relative "outcome"
+require_relative "nonexistant_guess_error"
 
 require_relative "board/wordle_unlimited"
+
 require_relative "dictionary/dictionary"
+require_relative "dictionary/live_dictionary"
 
 require_relative "strategy/most_common"
 require_relative "strategy/naive"
@@ -15,7 +18,7 @@ class Game
   attr_reader :board, :dictionary, :start_strategy, :strategy, :outcomes
   def initialize(
     board: Board::WordleUnlimited,
-    dictionary: Dictionary::Dictionary,
+    dictionary: Dictionary::LiveDictionary,
     start_strategy: Strategy::MostCommon,
     strategy: Strategy::Template
   )
@@ -41,7 +44,11 @@ class Game
           template: board.template,
         )
 
-      board.answer(guess)
+      begin
+        board.answer(guess)
+      rescue NonexistantGuessError
+        dictionary.exclude(guess)
+      end
 
       if board.winner?
         @outcomes << Outcome.new(
@@ -62,6 +69,7 @@ class Game
   end
 
   def exit!
+    dictionary.close!
     board.close!
 
     puts
