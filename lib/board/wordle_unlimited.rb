@@ -4,7 +4,7 @@ require "webdrivers"
 
 module Board
   class WordleUnlimited
-    attr :guesses, :session
+    attr :session
 
     def initialize
       @guesses = []
@@ -50,12 +50,31 @@ module Board
       @session.quit
     end
 
+    def guesses
+      locked_in.map { |row| row.text.tr("\n", "").downcase }
+    end
+
     def first_guess?
       guesses.empty?
     end
 
     def correct_answer
       session.find('div.feedback > div > b').text
+    end
+
+    def template
+      return Array.new(5, "*") unless locked_in.any?
+
+      locked_in
+        .last
+        .find_all('div.RowL-letter', wait: 0)
+        .map do |letter|
+          if letter.[]("class").split.include?("letter-correct")
+            letter.text.downcase
+          else
+            "*"
+          end
+        end
     end
 
     private
@@ -76,6 +95,10 @@ module Board
 
     def answer_invalid?
       session.has_text?(:visible, "Not a valid word", wait: 2)
+    end
+
+    def locked_in
+      session.find_all('div.RowL.RowL-locked-in', wait: 0) || []
     end
 
     def click(key)

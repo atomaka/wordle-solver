@@ -1,16 +1,15 @@
 module Strategy
   class WheelOfFortune
-    WORD_SIZE = 5
+    attr :dictionary, :word_size
 
-    attr :dictionary
-
-    def initialize(dictionary:)
+    def initialize(dictionary:, word_size: 5)
       @dictionary = dictionary
+      @word_size = word_size
     end
 
     def guess(**args)
       dictionary.words
-        .select { |word| word.length == WORD_SIZE }
+        .select { |word| word.length == word_size }
         .select { |word| (start_letters - word.chars).length == 1 }
         .sample
     end

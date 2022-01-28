@@ -1,5 +1,5 @@
 module Strategy
-  class Naive
+  class Vowels
     attr :dictionary, :word_size
 
     def initialize(dictionary:, word_size: 5)
@@ -7,12 +7,17 @@ module Strategy
       @word_size = word_size
     end
 
-    def guess(good_letters:, bad_letters:, **args)
+    def guess(**args)
       dictionary.words
         .select { |word| word.length == word_size }
-        .reject { |word| bad_letters.any? { |letter| word.chars.include?(letter) } }
-        .select { |word| (good_letters - word.chars).length == 0 }
+        .select { |word| (vowels - word.chars).length <= 2 }
         .sample
+    end
+
+    private
+
+    def vowels
+      %w(a e i o u y)
     end
   end
 end

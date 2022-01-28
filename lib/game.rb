@@ -5,7 +5,10 @@ require_relative "outcome"
 require_relative "board/wordle_unlimited"
 require_relative "dictionary/dictionary"
 
+require_relative "strategy/most_common"
 require_relative "strategy/naive"
+require_relative "strategy/template"
+require_relative "strategy/vowels"
 require_relative "strategy/wheel_of_fortune"
 
 class Game
@@ -13,8 +16,8 @@ class Game
   def initialize(
     board: Board::WordleUnlimited,
     dictionary: Dictionary::Dictionary,
-    start_strategy: Strategy::WheelOfFortune,
-    strategy: Strategy::Naive
+    start_strategy: Strategy::MostCommon,
+    strategy: Strategy::Template
   )
     @board = board.new
     @dictionary = dictionary.new
@@ -35,6 +38,7 @@ class Game
           good_letters: board.allowed_letters,
           bad_letters: board.bad_letters,
           guesses: board.guesses,
+          template: board.template,
         )
 
       board.answer(guess)
