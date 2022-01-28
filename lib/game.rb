@@ -42,7 +42,7 @@ class Game
       if board.winner?
         @outcomes << Outcome.new(
           state: :win,
-          correct: board.correct_answer,
+          correct: board.guesses.last,
           guesses: board.guesses,
         )
         board.reset!
