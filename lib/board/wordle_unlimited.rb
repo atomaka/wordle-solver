@@ -3,6 +3,8 @@ require "selenium-webdriver"
 require "webdrivers"
 
 require_relative "../nonexistant_guess_error"
+require_relative "../played_board"
+require_relative "../played_letter"
 
 module Board
   class WordleUnlimited
@@ -78,6 +80,29 @@ module Board
             "*"
           end
         end
+    end
+
+    def state
+      PlayedBoard.new(
+        locked_in.map do |row|
+          letters = row
+            .find_all('div.RowL-letter', wait: 0)
+            .map do |letter|
+              state = if letter.[]("class").split.include?("letter-correct")
+                :correct
+              elsif letter.[]("class").split.include?("letter-elsewhere")
+                :elsewhere
+              elsif letter.[]("class").split.include?("letter-absent")
+                :absent
+              end
+
+              PlayedLetter.new(
+                letter: letter.text.downcase,
+                state: state
+              )
+            end
+        end
+      )
     end
 
     private

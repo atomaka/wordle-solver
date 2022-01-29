@@ -1,13 +1,17 @@
 require "debug"
+require "logger"
 
-require_relative "outcome"
 require_relative "nonexistant_guess_error"
+require_relative "outcome"
+require_relative "played_board"
+require_relative "played_letter"
 
 require_relative "board/wordle_unlimited"
 
 require_relative "dictionary/dictionary"
 require_relative "dictionary/live_dictionary"
 
+require_relative "strategy/basic_board"
 require_relative "strategy/most_common"
 require_relative "strategy/naive"
 require_relative "strategy/template"
@@ -16,11 +20,13 @@ require_relative "strategy/wheel_of_fortune"
 
 class Game
   attr_reader :board, :dictionary, :start_strategy, :strategy, :outcomes
+  attr :logger
+
   def initialize(
     board: Board::WordleUnlimited,
     dictionary: Dictionary::LiveDictionary,
-    start_strategy: Strategy::MostCommon,
-    strategy: Strategy::Template
+    start_strategy: Strategy::Vowels,
+    strategy: Strategy::BasicBoard
   )
     @board = board.new
     @dictionary = dictionary.new
@@ -28,6 +34,8 @@ class Game
     @strategy = strategy.new(dictionary: @dictionary)
 
     @outcomes = []
+
+    @logger = Logger.new("loss-logger.log")
   end
 
   def play
@@ -42,6 +50,7 @@ class Game
           bad_letters: board.bad_letters,
           guesses: board.guesses,
           template: board.template,
+          board: board.state,
         )
 
       begin
@@ -64,6 +73,8 @@ class Game
           guesses: board.guesses,
         )
         board.reset!
+
+        logger.info(outcomes.last.to_s)
       end
     end
   end

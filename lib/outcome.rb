@@ -14,4 +14,12 @@ class Outcome
   def loss?
     state == :loss
   end
+
+  def to_s
+    "#{state}: #{correct} guessing #{guesses_to_s}"
+  end
+
+  def guesses_to_s
+    guesses.join(", ")
+  end
 end
