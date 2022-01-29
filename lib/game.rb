@@ -1,4 +1,4 @@
-require "debug"
+require "debug" if RUBY_VERSION.to_i >= 3
 require "logger"
 
 require_relative "nonexistant_guess_error"
